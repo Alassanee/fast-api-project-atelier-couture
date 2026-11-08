@@ -14,6 +14,7 @@ from app.routers import (
     livraisons,
     mesures,
     paiements,
+    statistiques,
     utilisateurs,
 )
 
@@ -35,6 +36,7 @@ app.include_router(mesures.router, prefix=settings.api_prefix)
 app.include_router(commandes.router, prefix=settings.api_prefix)
 app.include_router(paiements.router, prefix=settings.api_prefix)
 app.include_router(livraisons.router, prefix=settings.api_prefix)
+app.include_router(statistiques.router, prefix=settings.api_prefix)
 
 
 @app.get("/health", tags=["Santé"], summary="Vérifie que l'API et la base répondent")
