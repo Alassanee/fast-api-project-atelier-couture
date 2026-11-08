@@ -2,7 +2,7 @@
 
 from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, field_validator, model_validator
 
 from app.enums import Role
 
@@ -36,6 +36,16 @@ class UtilisateurUpdate(BaseModel):
     role: Role | None = None
     actif: bool | None = None
     mot_de_passe: str | None = Field(default=None, min_length=MOT_DE_PASSE_MIN, max_length=128)
+
+    @model_validator(mode="after")
+    def _pas_de_null(self) -> "UtilisateurUpdate":
+        # Un champ envoyé explicitement à null ne peut pas vider une valeur obligatoire.
+        for champ in self.model_fields_set:
+            if getattr(self, champ) is None:
+                raise ValueError(f"le champ « {champ} » ne peut pas être vide")
+        if self.nom_complet is not None and not self.nom_complet.strip():
+            raise ValueError("le champ « nom_complet » ne peut pas être vide")
+        return self
 
 
 class UtilisateurRead(BaseModel):
