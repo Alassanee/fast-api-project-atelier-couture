@@ -6,7 +6,7 @@ from sqlalchemy import text
 from app.config import settings
 from app.dependencies import DbSession
 from app.exceptions import installer_gestionnaires
-from app.routers import auth, utilisateurs
+from app.routers import auth, clients, utilisateurs
 
 app = FastAPI(
     title=settings.app_name,
@@ -20,6 +20,7 @@ installer_gestionnaires(app)
 # Un routeur par domaine, tous sous le préfixe /api/v1.
 app.include_router(auth.router, prefix=settings.api_prefix)
 app.include_router(utilisateurs.router, prefix=settings.api_prefix)
+app.include_router(clients.router, prefix=settings.api_prefix)
 
 
 @app.get("/health", tags=["Santé"], summary="Vérifie que l'API et la base répondent")
