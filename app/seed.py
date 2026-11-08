@@ -1,7 +1,9 @@
-"""Script d'initialisation : python -m app.seed
+"""Script d'initialisation : python -m app.seed [--demo]
 
 Crée le premier administrateur (variables ADMIN_EMAIL, ADMIN_PASSWORD,
 ADMIN_NOM_COMPLET) et les prestations du catalogue de l'annexe B.
+Avec --demo, crée aussi un compte accueil et un compte tailleur pour le
+scénario de démonstration (mot de passe : variable DEMO_PASSWORD).
 Peut être relancé sans créer de doublons.
 """
 
@@ -54,6 +56,27 @@ def creer_admin(db: Session) -> None:
     print(f"+ Administrateur {email} : créé.")
 
 
+# Comptes de démonstration (annexe A) : (e-mail, nom complet, rôle)
+COMPTES_DEMO: list[tuple[str, str, Role]] = [
+    ("accueil@atelier.sn", "Aïssatou Ndiaye", Role.accueil),
+    ("tailleur@atelier.sn", "Moussa Diallo", Role.tailleur),
+]
+
+
+def creer_comptes_demo(db: Session) -> None:
+    mot_de_passe = settings.demo_password
+    if not mot_de_passe or len(mot_de_passe) < MOT_DE_PASSE_MIN:
+        print(f"DEMO_PASSWORD doit être défini dans le .env ({MOT_DE_PASSE_MIN} caractères minimum).")
+        sys.exit(1)
+    for email, nom_complet, role in COMPTES_DEMO:
+        if db.scalar(select(Utilisateur).where(func.lower(Utilisateur.email) == email)):
+            print(f"- Compte {role.value} {email} : déjà présent.")
+            continue
+        db.add(Utilisateur(email=email, nom_complet=nom_complet, role=role, actif=True,
+                           mot_de_passe_hash=hacher_mot_de_passe(mot_de_passe)))
+        print(f"+ Compte {role.value} {email} : créé.")
+
+
 def creer_catalogue(db: Session) -> None:
     for nom, description, prix_base, delai_jours in CATALOGUE_DEPART:
         if db.scalar(select(TypeVetement).where(TypeVetement.nom == nom)):
@@ -68,10 +91,13 @@ def creer_catalogue(db: Session) -> None:
         print(f"+ Prestation « {nom} » : créée.")
 
 
-def main() -> None:
+def main(arguments: list[str] | None = None) -> None:
+    arguments = sys.argv[1:] if arguments is None else arguments
     with SessionLocal() as db:
         creer_admin(db)
         creer_catalogue(db)
+        if "--demo" in arguments:
+            creer_comptes_demo(db)
         db.commit()
     print("Initialisation terminée.")
 

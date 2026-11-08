@@ -25,6 +25,9 @@ class Settings(BaseSettings):
     admin_password: str | None = None
     admin_nom_complet: str = "Administrateur"
 
+    # Comptes de démonstration accueil + tailleur (python -m app.seed --demo)
+    demo_password: str | None = None
+
 
 @lru_cache
 def get_settings() -> Settings:
