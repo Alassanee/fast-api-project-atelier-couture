@@ -49,7 +49,7 @@ def modifier_mesure(mesure_id: int, donnees: MesureUpdate, db: DbSession, _: Tai
     db.commit()
     return mesure
 
-
+# toute delete
 @router.delete(
     "/mesures/{mesure_id}", status_code=status.HTTP_204_NO_CONTENT,
     summary="Supprimer une prise de mesures (tailleur)",
