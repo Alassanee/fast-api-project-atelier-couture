@@ -292,7 +292,7 @@ def _verifier_date_prevue(commande: Commande, date_prevue: date) -> None:
         )
 
 
-def _historiser(
+def historiser(
     commande: Commande, ancien: StatutCommande | None, nouveau: StatutCommande,
     auteur: Utilisateur, commentaire: str | None = None,
 ) -> None:
@@ -341,7 +341,7 @@ def creer(db: Session, donnees: CommandeCreate, auteur: Utilisateur) -> Commande
         commande.date_livraison_prevue = commande.date_commande + timedelta(days=delai)
 
     recalculer_montants(commande)  # RG7
-    _historiser(commande, None, S.en_attente, auteur)  # RG15 : première ligne
+    historiser(commande, None, S.en_attente, auteur)  # RG15 : première ligne
     db.add(commande)
     db.flush()
     commande.numero = _numero(commande)  # RG5 : l'identifiant est connu après insertion
@@ -411,7 +411,7 @@ def changer_statut(
         )
 
     commande.statut = demande
-    _historiser(commande, actuel, demande, acteur, commentaire)  # RG15
+    historiser(commande, actuel, demande, acteur, commentaire)  # RG15
     db.flush()
     return commande
 

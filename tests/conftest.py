@@ -151,3 +151,18 @@ def fatou(db: Session) -> Client:
     db.add(cliente)
     db.commit()
     return cliente
+
+
+@pytest.fixture
+def commande(client: TestClient, h_accueil, catalogue, fatou) -> dict:
+    """Commande de démonstration de 75 000 FCFA : 2 boubous + 1 pantalon à 10 000, remise 5 000."""
+    r = client.post("/api/v1/commandes", json={
+        "client_id": fatou.id,
+        "lignes": [
+            {"type_vetement_id": catalogue["boubou"].id, "quantite": 2},
+            {"type_vetement_id": catalogue["pantalon"].id, "prix_unitaire": 10_000},
+        ],
+        "remise": 5_000,
+    }, headers=h_accueil)
+    assert r.status_code == 201, r.json()
+    return r.json()

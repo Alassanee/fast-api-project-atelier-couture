@@ -8,21 +8,6 @@ API = "/api/v1"
 AUJOURD_HUI = date.today()
 
 
-@pytest.fixture
-def commande(client, h_accueil, catalogue, fatou):
-    """Commande de 75 000 FCFA (2 boubous + 1 pantalon à 10 000 − 5 000 de remise)."""
-    r = client.post(f"{API}/commandes", json={
-        "client_id": fatou.id,
-        "lignes": [
-            {"type_vetement_id": catalogue["boubou"].id, "quantite": 2},
-            {"type_vetement_id": catalogue["pantalon"].id, "prix_unitaire": 10_000},
-        ],
-        "remise": 5_000,
-    }, headers=h_accueil)
-    assert r.status_code == 201
-    return r.json()
-
-
 def payer(client, h, commande_id, montant, mode="wave", **kw):
     return client.post(f"{API}/commandes/{commande_id}/paiements",
                        json={"montant": montant, "mode": mode, **kw}, headers=h)
