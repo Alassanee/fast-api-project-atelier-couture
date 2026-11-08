@@ -1,8 +1,12 @@
 """Point d'entrée de l'API : création de l'application FastAPI."""
 
 from fastapi import FastAPI
+from sqlalchemy import text
 
 from app.config import settings
+from app.dependencies import DbSession
+from app.exceptions import installer_gestionnaires
+from app.routers import auth
 
 app = FastAPI(
     title=settings.app_name,
@@ -11,4 +15,13 @@ app = FastAPI(
     version="1.0.0",
 )
 
-# Les routeurs (un fichier par domaine) seront inclus ici sous le préfixe /api/v1.
+installer_gestionnaires(app)
+
+# Un routeur par domaine, tous sous le préfixe /api/v1.
+app.include_router(auth.router, prefix=settings.api_prefix)
+
+
+@app.get("/health", tags=["Santé"], summary="Vérifie que l'API et la base répondent")
+def health(db: DbSession) -> dict[str, str]:
+    db.execute(text("SELECT 1"))
+    return {"status": "ok"}
