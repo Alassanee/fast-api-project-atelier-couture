@@ -30,7 +30,7 @@ from sqlalchemy.orm import Session  # noqa: E402
 from app.database import Base, SessionLocal, engine  # noqa: E402
 from app.enums import Role  # noqa: E402
 from app.main import app  # noqa: E402
-from app.models import Utilisateur  # noqa: E402
+from app.models import Client, TypeVetement, Utilisateur  # noqa: E402
 from app.security import creer_jeton_acces, hacher_mot_de_passe  # noqa: E402
 
 MOT_DE_PASSE = "motdepasse123"
@@ -127,3 +127,27 @@ def h_accueil(accueil) -> dict[str, str]:
 @pytest.fixture
 def h_tailleur(tailleur) -> dict[str, str]:
     return entetes(tailleur)
+
+
+# --- Données métier communes ---------------------------------------------------------
+
+
+@pytest.fixture
+def catalogue(db: Session) -> dict[str, TypeVetement]:
+    prestations = {
+        "boubou": TypeVetement(nom="Boubou", prix_base=35_000, delai_jours=10),
+        "pantalon": TypeVetement(nom="Pantalon", prix_base=12_000, delai_jours=4),
+        "retouche": TypeVetement(nom="Retouche", prix_base=3_000, delai_jours=2),
+        "retiree": TypeVetement(nom="Ancienne tenue", prix_base=9_000, delai_jours=3, actif=False),
+    }
+    db.add_all(prestations.values())
+    db.commit()
+    return prestations
+
+
+@pytest.fixture
+def fatou(db: Session) -> Client:
+    cliente = Client(nom="Diop", prenom="Fatou", telephone="771234567", genre="femme")
+    db.add(cliente)
+    db.commit()
+    return cliente

@@ -4,18 +4,10 @@ from datetime import date, timedelta
 
 import pytest
 
-from app.models import Client, Commande
+from app.models import Commande
 from app.models.mesure import CHAMPS_MESURES
 
 API = "/api/v1"
-
-
-@pytest.fixture
-def fatou(db):
-    c = Client(nom="Diop", prenom="Fatou", telephone="771234567", genre="femme")
-    db.add(c)
-    db.commit()
-    return c
 
 
 def url_client(client_id):

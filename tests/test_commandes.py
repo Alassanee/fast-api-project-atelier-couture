@@ -6,34 +6,13 @@ from datetime import date, timedelta
 import pytest
 
 from app.enums import ModePaiement
-from app.models import Client, Commande, Mesure, Paiement, TypeVetement
+from app.models import Client, Commande, Mesure, Paiement
 
 URL = "/api/v1/commandes"
 AUJOURD_HUI = date.today()
 
 
 # --- Données de départ --------------------------------------------------------------
-
-@pytest.fixture
-def catalogue(db):
-    prestations = {
-        "boubou": TypeVetement(nom="Boubou", prix_base=35_000, delai_jours=10),
-        "pantalon": TypeVetement(nom="Pantalon", prix_base=12_000, delai_jours=4),
-        "retouche": TypeVetement(nom="Retouche", prix_base=3_000, delai_jours=2),
-        "retiree": TypeVetement(nom="Ancienne tenue", prix_base=9_000, delai_jours=3, actif=False),
-    }
-    db.add_all(prestations.values())
-    db.commit()
-    return prestations
-
-
-@pytest.fixture
-def fatou(db):
-    c = Client(nom="Diop", prenom="Fatou", telephone="771234567", genre="femme")
-    db.add(c)
-    db.commit()
-    return c
-
 
 @pytest.fixture
 def mesures_fatou(db, fatou, tailleur):
